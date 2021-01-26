@@ -3,7 +3,7 @@
  */
 package client;
 
-import battleship.client.Library;
+import battleship.client.Battleship;
 
 public class App {
     public String getGreeting() {
@@ -13,10 +13,12 @@ public class App {
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
 
-        Library test = new Library();
+        Battleship test = new Battleship();
 
         if (test.someLibraryMethod()) {
             System.out.println("hiiiii");
         }
+
+        System.out.println(test.getWebSocket());
     }
 }

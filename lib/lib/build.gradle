@@ -8,6 +8,7 @@
 
 plugins {
     // Apply the java-library plugin for API and implementation separation.
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'java-library'
 }
 
@@ -25,4 +26,7 @@ dependencies {
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:29.0-jre'
+
+    // From https://github.com/TakahikoKawasaki/nv-websocket-client
+    compile 'com.neovisionaries:nv-websocket-client:2.11'
 }
