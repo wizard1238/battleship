@@ -5,15 +5,19 @@ package client;
 
 import battleship.client.Battleship;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
+public class App extends Battleship {
+    public App() throws Exception {
+        super();
+    }
+
+    @Override
+    public void recievedText(String msg) {
+        System.out.println(msg);
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(new App().getGreeting());
-
-        Battleship test = new Battleship();
-        test.sendText("Bye");
+        App app = new App();
+        
+        app.sendText("{\"option\": \"dio\"}");
     }
 }

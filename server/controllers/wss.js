@@ -26,7 +26,7 @@ exports.createWSS = function(server) {
             }
             
 
-            if (msg == 'dio') {
+            if (msg.option == 'dio') {
                 ws.send('you were expecting a response, but it was me, dio!')
                 console.log("wow dio")
             } else if (msg.option == 'new') {
@@ -36,7 +36,7 @@ exports.createWSS = function(server) {
                 ws.send('You sent: ' + msg)
             }
 
-            
+
         })
 
         ws.on('close', function() {

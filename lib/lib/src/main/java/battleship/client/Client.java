@@ -10,12 +10,15 @@ import org.java_websocket.handshake.ServerHandshake;
 
 public class Client extends WebSocketClient {
 
+    Battleship battleship;
+
     public boolean someLibraryMethod() {
         return true;
     }
 
-    public Client(URI serverURI) {
+    public Client(URI serverURI, Battleship battleship) {
         super(serverURI);
+        this.battleship = battleship;
     }
 
     @Override
@@ -26,8 +29,7 @@ public class Client extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        System.out.println(message);
-
+        battleship.recievedText(message);
     }
 
     @Override
