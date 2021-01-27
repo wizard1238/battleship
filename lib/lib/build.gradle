@@ -27,6 +27,6 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:29.0-jre'
 
-    // From https://github.com/TakahikoKawasaki/nv-websocket-client
-    compile 'com.neovisionaries:nv-websocket-client:2.11'
+    //From https://github.com/TooTallNate/Java-WebSocket
+    compile "org.java-websocket:Java-WebSocket:1.5.1"
 }

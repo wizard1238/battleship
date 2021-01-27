@@ -10,15 +10,10 @@ public class App {
         return "Hello World!";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println(new App().getGreeting());
 
         Battleship test = new Battleship();
-
-        if (test.someLibraryMethod()) {
-            System.out.println("hiiiii");
-        }
-
-        System.out.println(test.getWebSocket());
+        test.sendText("Bye");
     }
 }
