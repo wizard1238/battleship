@@ -5,7 +5,6 @@
  */
 
 var app = require('../app');
-var ws = require('ws')
 var wss= require('../controllers/wss')
 var debug = require('debug')('websockets:server');
 var http = require('http');

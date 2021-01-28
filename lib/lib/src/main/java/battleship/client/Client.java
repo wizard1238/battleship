@@ -12,7 +12,7 @@ public class Client extends WebSocketClient {
 
     Battleship battleship;
 
-    public boolean someLibraryMethod() {
+    public boolean someLibraryMethod() { // poggers name
         return true;
     }
 
