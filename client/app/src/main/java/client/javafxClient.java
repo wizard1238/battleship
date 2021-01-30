@@ -122,6 +122,10 @@ public class javafxClient extends Application implements BattleshipInterface {
         System.out.println(col + row);
     }
 
+    public void gameDestroyed() {
+        System.out.println("The other player has disconnected. Game destroyed :(");
+    }
+
     public void someClientMethod() {
         System.out.println("called");
     }
@@ -133,7 +137,7 @@ public class javafxClient extends Application implements BattleshipInterface {
         javafxClient c = new javafxClient();
         Battleship app = new Battleship(c);
         // System.out.println(app.createNewGame());
-        String code = "ce288ea3-8b4a-40b5-b49e-ae33373b2b39";
+        String code = "6da5a0cd-1668-46a2-8a52-ad92fe0e4bb0";
         System.out.println(app.joinGame(code));
         // System.out.println(app.makeMove('c', 2));
         // app.joinGame("hello");

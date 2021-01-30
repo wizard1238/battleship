@@ -33,17 +33,12 @@ exports.createWSS = function(server) {
                 clients[clientId].gameObject.matchId = createNewGame(clientId)
                 ws.send(JSON.stringify(clients[clientId].gameObject))
             } else if (msg.option == 'join') { // join a game
-                console.log(msg)
-                console.log(matches[msg.matchId])
                 if (!msg.matchId) {
                     ws.send('No matchId sent')
                 } else if (!matches[msg.matchId]) {
-                    console.log("the server is big dum dum")
                     ws.send('No match exists with that matchId')
                 } else {
-                    console.log("server worked")
                     clients[clientId].gameObject.matchId = joinGame(msg.matchId, clientId)
-                    console.log(JSON.stringify(clients[clientId].gameObject))
                     ws.send(JSON.stringify(clients[clientId].gameObject))
                 }
             } else if (msg.option == 'ready') { // 
@@ -98,7 +93,7 @@ exports.createWSS = function(server) {
         })
 
         ws.on('close', function() {
-            removeGameWithClient(clientId) //should remove match that has the client in it
+            removeGameWithClient(clientId)
             console.log('disconnected')
         })
     })
@@ -133,7 +128,7 @@ exports.createWSS = function(server) {
         } else if (!matches[clients[clientId].gameObject.matchId].player1 || !matches[clients[clientId].gameObject.matchId].player2) {
             delete matches[clients[clientId].gameObject.matchId]
         } else {
-            var otherClientId = (matches[clients[clientId].gameObject.matchId].player1 == clientId) ? player2 : player1
+            var otherClientId = (matches[clients[clientId].gameObject.matchId].player1 == clientId) ? matches[clients[clientId].gameObject.matchId].player2 : matches[clients[clientId].gameObject.matchId].player1
 
             clients[otherClientId].ws.send('The other player has disconnected')
             delete clients[otherClientId].gameObject.matchId

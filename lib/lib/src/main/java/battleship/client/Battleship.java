@@ -36,7 +36,9 @@ public class Battleship {
             this.jsonElement = JsonParser.parseString(msg);
             this.gameState = jsonElement.getAsJsonObject();
         } catch (Exception e) {
-            if (this.currDataRequest.equals("join")) {
+            if (msg.equals("The other player has disconnected")) {
+                gameDestroyed();
+            } else if (this.currDataRequest.equals("join")) {
                 this.matchId = msg;
                 joinGameLatch.countDown();
             } else if (this.currDataRequest.equals("matchId")) {
@@ -54,22 +56,18 @@ public class Battleship {
         if (this.currDataRequest.equals("join")) {
             this.matchId = this.gameState.get("matchId").toString();
             joinGameLatch.countDown();
-            System.out.println(this.matchId);
         } else if (this.currDataRequest.equals("matchId")) {
             this.matchId = this.gameState.get("matchId").toString();
             createNewGameLatch.countDown();
-            System.out.println(this.matchId);
         } else if (this.currDataRequest.equals("ready")) {
             this.readyData = this.gameState.get("matchId").toString(); // TODO: Change to actual game object
             readyLatch.countDown();
-            System.out.println(this.readyData);
         // } else if (this.currDataRequest.equals("sendMove")) {
         //     this.moveData = this.gameState.get("matchId").toString(); // TODO: Change to actual game object
         //     sendMoveLatch.countDown();
         //     System.out.println(this.moveData);
         } else if (this.currDataRequest.equals("receiveMove")) {
             receivedMove(this.gameState.get("col").toString().charAt(0), Integer.parseInt(this.gameState.get("row").toString()));
-            System.out.println(this.receivedMove);
         }
     }
 
@@ -132,5 +130,9 @@ public class Battleship {
 
     public void receivedMove(char col, int row) {
         this.battleshipInterface.recievedMove(col, row);
+    }
+
+    public void gameDestroyed() {
+        this.battleshipInterface.gameDestroyed();
     }
 }
