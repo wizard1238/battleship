@@ -31,43 +31,60 @@ exports.createWSS = function(server) {
                 console.log("wow dio")
             } else if (msg.option == 'new') { // create new game
                 clients[clientId].gameObject.matchId = createNewGame(clientId)
-                ws.send(clients[clientId].gameObject)
-                console.log(clients)
+                ws.send(JSON.stringify(clients[clientId].gameObject))
             } else if (msg.option == 'join') { // join a game
-                clients[clientId].gameObject.matchId = joinGame(msg.matchId, clientId)
-                ws.send(clients[clientId].gameObject)
+                if (!msg.matchId) {
+                    ws.send('No matchId sent')
+                } else if (!matches[msg.matchId]) {
+                    ws.send('No match exists with that matchId')
+                } else {
+                    clients[clientId].gameObject.matchId = joinGame(msg.matchId, clientId)
+                    ws.send(JSON.stringify(clients[clientId].gameObject))
+                }
             } else if (msg.option == 'ready') { // 
                 if (!clients[clientId].gameObject.matchId) {
                     ws.send('No match joined')
                 } else if (!matches[clients[clientId].gameObject.matchId]) {
                     ws.send('No match exists with that id')
+                } else if (!matches[clients[clientId].gameObject.matchId].player1 || !matches[clients[clientId].gameObject.matchId].player2) {
+                    ws.send('No other player')
                 } else {
                     clients[clientId].gameObject.ready = true
-                    ws.send(clients[clientId].gameObject)
+                    ws.send(JSON.stringify(clients[clientId].gameObject))
                 }
             } else if (msg.option == 'move') {
                 if (!clients[clientId].gameObject.matchId) {
                     ws.send('No match joined')
                 } else if (!matches[clients[clientId].gameObject.matchId]) {
                     ws.send('No match exists with that id')
+                } else if (!matches[clients[clientId].gameObject.matchId].player1 || !matches[clients[clientId].gameObject.matchId].player2) {
+                    ws.send('No other player')
                 } else {
                     var otherClientId = (matches[clients[clientId].gameObject.matchId].player1 == clientId) ? player2 : player1
 
-                    clients[otherClientId].ws.send({
-                        move: msg.move
-                    })
+                    if (!msg.col || !msg.row) {
+                        ws.send('Missing parameters')
+                    } else {
+                        ws.send('')
+                        clients[otherClientId].ws.send(JSON.stringify({
+                            col: msg.col,
+                            row: msg.row,
+                        }))
+                    }
                 }
             } else if (msg.option == 'response') {
                 if (!clients[clientId].gameObject.matchId) {
                     ws.send('No match joined')
                 } else if (!matches[clients[clientId].gameObject.matchId]) {
                     ws.send('No match exists with that id')
+                } else if (!matches[clients[clientId].gameObject.matchId].player1 || !matches[clients[clientId].gameObject.matchId].player2) {
+                    ws.send('No other player')
                 } else {
                     var otherClientId = (matches[clients[clientId].gameObject.matchId].player1 == clientId) ? player2 : player1
 
-                    clients[otherClientId].ws.send({
+                    clients[otherClientId].ws.send(JSON.stringify({
                         response: msg.response
-                    })
+                    }))
                 }
             }
             else {
@@ -76,7 +93,7 @@ exports.createWSS = function(server) {
         })
 
         ws.on('close', function() {
-            removeGameWithClient(clientId, gameObject.matchId) //should remove match that has the client in it
+            removeGameWithClient(clientId) //should remove match that has the client in it
             console.log('disconnected')
         })
     })
@@ -102,13 +119,23 @@ exports.createWSS = function(server) {
         }
     }
 
-    var removeGameWithClient = function(clientId, matchId) {
-        var otherClientId = (matches[clients[clientId].gameObject.matchId].player1 == clientId) ? player2 : player1
+    var removeGameWithClient = function(clientId) {
 
-        clients[otherClientId].ws.send('The other player has disconnected')
-        delete clients[otherClientId].gameObject.matchId
+        if (!clients[clientId].gameObject.matchId) {
+            //do nothing
+        } else if (!matches[clients[clientId].gameObject.matchId]) {
+            //do nothing
+        } else if (!matches[clients[clientId].gameObject.matchId].player1 || !matches[clients[clientId].gameObject.matchId].player2) {
+            delete matches[clients[clientId].gameObject.matchId]
+        } else {
+            var otherClientId = (matches[clients[clientId].gameObject.matchId].player1 == clientId) ? player2 : player1
+
+            clients[otherClientId].ws.send('The other player has disconnected')
+            delete clients[otherClientId].gameObject.matchId
+
+            delete matches[clients[clientId].gameObject.matchId]
+        }
 
         delete clients[clientId]
-        delete matches[matchId]
     }
 }

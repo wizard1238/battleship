@@ -4,20 +4,37 @@
 package client;
 
 import battleship.client.Battleship;
+import java.util.*;
 
-public class App extends Battleship {
-    public App() throws Exception {
-        super();
-    }
+public class App {
+    // public App() throws Exception {
+    //     super();
+    // }
 
-    @Override
-    public void recievedText(String msg) {
-        System.out.println(msg);
-    }
+    // @Override
+    // public void recievedText(String msg) {
+    //     System.out.println(msg);
+    // }
 
-    public static void main(String[] args) throws Exception {
-        App app = new App();
+    // public static void main(String[] args) throws Exception {
+    //     App app = new App();
+    //     Scanner sc = new Scanner(System.in);
         
-        app.sendText("{\"option\": \"dio\"}");
+        // app.sendText("{\"option\": \"dio\"}");
+    // }
+
+    public static void beginGame(App app) {
+        // System.out.println("Would you like to create a new game or join an existing one?: c/j >> ");
+        // String opt = sc.nextLine();
+
+        // if (opt.equals("c")) {
+        //     app.createNewGame();
+        // } else if (opt.equals("j")) {
+        //     System.out.println("Enter the game code provided to you by the other player: >> ");
+        //     opt = sc.nextLine();
+        //     System.out.println(app.joinGame(opt));
+        // } else {
+        //     this.beginGame(app);
+        // }
     }
 }
