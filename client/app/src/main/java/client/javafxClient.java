@@ -133,8 +133,9 @@ public class javafxClient extends Application implements BattleshipInterface {
         javafxClient c = new javafxClient();
         Battleship app = new Battleship(c);
         // System.out.println(app.createNewGame());
-        System.out.println(app.joinGame(""));
-        System.out.println(app.makeMove('c', 2));
+        String code = "ce288ea3-8b4a-40b5-b49e-ae33373b2b39";
+        System.out.println(app.joinGame(code));
+        // System.out.println(app.makeMove('c', 2));
         // app.joinGame("hello");
     }
 }

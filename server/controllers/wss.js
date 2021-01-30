@@ -33,12 +33,17 @@ exports.createWSS = function(server) {
                 clients[clientId].gameObject.matchId = createNewGame(clientId)
                 ws.send(JSON.stringify(clients[clientId].gameObject))
             } else if (msg.option == 'join') { // join a game
+                console.log(msg)
+                console.log(matches[msg.matchId])
                 if (!msg.matchId) {
                     ws.send('No matchId sent')
                 } else if (!matches[msg.matchId]) {
+                    console.log("the server is big dum dum")
                     ws.send('No match exists with that matchId')
                 } else {
+                    console.log("server worked")
                     clients[clientId].gameObject.matchId = joinGame(msg.matchId, clientId)
+                    console.log(JSON.stringify(clients[clientId].gameObject))
                     ws.send(JSON.stringify(clients[clientId].gameObject))
                 }
             } else if (msg.option == 'ready') { // 
@@ -110,7 +115,7 @@ exports.createWSS = function(server) {
     }
 
     var joinGame = function(matchId, clientId) {
-        if (!clients[matchId]) {
+        if (!matches[matchId]) {
             return 'No match exists with that id'
         } else {
             clients[clientId].matchId = matchId

@@ -32,7 +32,6 @@ public class Battleship {
     public void recievedText(String msg) { // Called when text is recieved by client
         // System.out.println("recieved text");
 
-
         try {
             this.jsonElement = JsonParser.parseString(msg);
             this.gameState = jsonElement.getAsJsonObject();
@@ -88,7 +87,8 @@ public class Battleship {
     
     public String joinGame(String matchId) { // returns game code
         this.currDataRequest = "join";
-        this.sendText("{ \"option\": \"join\", \"matchId\": \"" + matchId + "\" }");
+        // this.sendText("{ \"option\": \"join\", \"matchId\": \"" + matchId + "\" }");
+        this.sendText(String.format("{ \"option\": \"join\", \"matchId\": \"%s\" }", matchId));
 
         try {
             joinGameLatch.await(); // blocking, only in method scope
