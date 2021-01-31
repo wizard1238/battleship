@@ -29,7 +29,7 @@ public class Battleship {
         client.send(msg);
     }
 
-    public void recievedText(String msg) { // Called when text is recieved by client
+    public void recievedText(String msg) throws BattleshipParsingException { // Called when text is recieved by client
         // System.out.println("recieved text");
 
         try {
@@ -39,17 +39,21 @@ public class Battleship {
             if (msg.equals("The other player has disconnected")) {
                 gameDestroyed();
             } else if (this.currDataRequest.equals("join")) {
-                this.matchId = msg;
+                // this.matchId = msg;
                 joinGameLatch.countDown();
+                throw new BattleshipParsingException(msg);
             } else if (this.currDataRequest.equals("matchId")) {
-                this.matchId = msg;
+                // this.matchId = msg;
                 createNewGameLatch.countDown();
+                throw new BattleshipParsingException(msg);
             } else if (this.currDataRequest.equals("ready")) {
-                this.readyData = msg;
+                // this.readyData = msg;
                 readyLatch.countDown();
+                throw new BattleshipParsingException(msg);
             } else if (this.currDataRequest.equals("sendMove")) {
-                this.moveData = msg;
+                // this.moveData = msg;
                 sendMoveLatch.countDown();
+                throw new BattleshipParsingException(msg);
             }
         }
        
@@ -85,7 +89,6 @@ public class Battleship {
     
     public String joinGame(String matchId) { // returns game code
         this.currDataRequest = "join";
-        // this.sendText("{ \"option\": \"join\", \"matchId\": \"" + matchId + "\" }");
         this.sendText(String.format("{ \"option\": \"join\", \"matchId\": \"%s\" }", matchId));
 
         try {

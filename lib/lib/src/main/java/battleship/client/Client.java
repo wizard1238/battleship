@@ -24,12 +24,15 @@ public class Client extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         System.out.println("Connected");
-
     }
 
     @Override
     public void onMessage(String message) {
-        battleship.recievedText(message);
+        try {
+            battleship.recievedText(message);
+        } catch (BattleshipParsingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
