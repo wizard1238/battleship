@@ -1,3 +1,5 @@
+package client;
+
 public class Ship
 {
     private String name;

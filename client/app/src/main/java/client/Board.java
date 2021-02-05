@@ -1,3 +1,5 @@
+package client;
+
 public class Board
 {
     private static final int ROWS = 11;
@@ -112,4 +114,8 @@ public class Board
     public boolean gameOver(){
         return hit >= 17;
     }
+
+    public char getValue(int row, int col){
+        return board[row][col];
+      }
 }

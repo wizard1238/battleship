@@ -1,3 +1,5 @@
+package client;
+
 public class Fleet
 {
     private Ship[] ships = new Ship[5];
