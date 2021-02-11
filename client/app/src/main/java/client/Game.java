@@ -3,6 +3,7 @@ package client;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,18 +16,29 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 import javafx.geometry.HPos;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
+
 import java.util.concurrent.atomic.AtomicInteger;
+
+import battleship.client.Battleship;
+import battleship.client.BattleshipInterface;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.geometry.Rectangle2D;
 
 
-public class Game extends Application
+public class Game extends Application implements BattleshipInterface
 {
+    
     @Override
-    public void start(Stage stage)
-    {
+    public void start(Stage stage) throws Exception {
+        Battleship battleshipLib = new Battleship(this);
+        System.out.println(battleshipLib.createNewGame());
+
         Board myBoard = new Board();
         Board enemyBoard = new Board();
         
@@ -42,8 +54,8 @@ public class Game extends Application
         Ship carrier = new Ship("Carrier", 4, 5);
         fleet.addShip(carrier);
         
-        AtomicInteger locationX = new AtomicInteger(-1);
-        AtomicInteger locationY = new AtomicInteger(-1);
+        AtomicInteger locationX = new AtomicInteger(-1); // col
+        AtomicInteger locationY = new AtomicInteger(-1); // row
         AtomicInteger counter = new AtomicInteger(0);
         Rectangle[][] myRectangles = new Rectangle[11][9];
         Rectangle[][] enemyRectangles = new Rectangle[11][9];
@@ -234,6 +246,7 @@ public class Game extends Application
                 circle.setFill(Color.RED);
                 pane.add(circle, locationX.get()+12, locationY.get()+1);
                 hitPopup.hide();
+                e.consume();
             }
         });
         
@@ -245,6 +258,7 @@ public class Game extends Application
                 circle.setFill(Color.GREEN);
                 pane.add(circle, locationX.get()+12, locationY.get()+1);
                 hitPopup.hide();
+                e.consume();
             }
         });
         
@@ -256,13 +270,14 @@ public class Game extends Application
                 circle.setFill(Color.YELLOW);
                 pane.add(circle, locationX.get()+12, locationY.get()+1);
                 hitPopup.hide();
+                e.consume();
             }
         });
         
         pane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             int x = ((int)(event.getSceneX())/40);
             int y = ((int)(event.getSceneY())/40);
-            System.out.println("X: " + x + " Y: " + y);
+            // System.out.println("X: " + x + " Y: " + y);
             if(x >= 1 && x <= 9 && y >= 1 && y <= 11){
                 int count = counter.get();
                 if(count < 5){
@@ -273,23 +288,63 @@ public class Game extends Application
                    Circle circle = new Circle();
                    circle.setRadius(15);
                    myBoard.updateUserBoard(y-1, x-1);
-                   if(myBoard.getValue(y-1, x-1) == 'H'){
+                   if(myBoard.getValue(y-1, x-1) == 'H') {
                        circle.setFill(Color.RED);
                    } else {
                        circle.setFill(Color.GREEN);
                    }
                    pane.add(circle, x, y);
                 }
-            } else if(x >= 12 && x <= 20 && y >= 1 && y <= 11){
-                locationX.set(x-12);
-                locationY.set(y-1);
+            } else if(x >= 12 && x <= 20 && y >= 1 && y <= 11) {
+                locationX.set(x-12); //Col
+                locationY.set(y-1); //Row
+
+                battleshipLib.makeMove(locationX.get(), (char)(locationY.get() + 97));
                 hitPopup.show(stage);
             }
         });
-        
-        Scene scene = new Scene(pane,880,520);
+
+
+        GridPane startupPane = new GridPane();
+        startupPane.add(new Label("Hello World"), 0, 0);
+
+        Button startButton = new Button("Start");
+        startButton.setLayoutX(130);
+        startButton.setLayoutY(5);
+
+        boolean startButtonClicked = false;
+        startButton.setOnAction(new EventHandler<ActionEvent>(){
+            public void handle(ActionEvent e) {
+                // startButtonClicked = true;
+                System.out.println("hello world");
+                e.consume();
+            }
+        });
+        startupPane.add(startButton, 100, 100);
+
+
+        Scene startupPage = new Scene(startupPane, 880, 520);
         stage.setTitle("Battleship");
-        stage.setScene(scene);
+        stage.setScene(startupPage);
         stage.show();
+
+        // TODO: show on some conditional after startup is done
+        Scene scene = new Scene(pane,880,520);
+        stage.setScene(scene);
+    }
+
+    @Override
+    public void gameDestroyed() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void matchJoined(String arg0) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void recievedMove(int arg0, char arg1) {
+        // TODO Auto-generated method stub
     }
 }

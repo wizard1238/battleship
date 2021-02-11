@@ -7,7 +7,7 @@ import org.java_websocket.client.WebSocketClient;
 import com.google.gson.*;
 
 public class Battleship {
-    WebSocketClient client = new Client(new URI("wss://simfony.tech/mitty/websocket"), this);
+    WebSocketClient client = new Client(new URI("wss://simfony.tech/mitty/battleship"), this);
     BattleshipInterface battleshipInterface;
 
     Gson gson = new Gson();
@@ -30,8 +30,6 @@ public class Battleship {
     }
 
     public void recievedText(String msg) throws BattleshipParsingException { // Called when text is recieved by client
-        // System.out.println("recieved text");
-
         try {
             this.jsonElement = JsonParser.parseString(msg);
             this.gameState = jsonElement.getAsJsonObject();
@@ -39,19 +37,15 @@ public class Battleship {
             if (msg.equals("The other player has disconnected")) {
                 gameDestroyed();
             } else if (this.currDataRequest.equals("join")) {
-                // this.matchId = msg;
                 joinGameLatch.countDown();
                 throw new BattleshipParsingException(msg);
             } else if (this.currDataRequest.equals("matchId")) {
-                // this.matchId = msg;
                 createNewGameLatch.countDown();
                 throw new BattleshipParsingException(msg);
             } else if (this.currDataRequest.equals("ready")) {
-                // this.readyData = msg;
                 readyLatch.countDown();
                 throw new BattleshipParsingException(msg);
             } else if (this.currDataRequest.equals("sendMove")) {
-                // this.moveData = msg;
                 sendMoveLatch.countDown();
                 throw new BattleshipParsingException(msg);
             }
@@ -71,7 +65,7 @@ public class Battleship {
         //     sendMoveLatch.countDown();
         //     System.out.println(this.moveData);
         } else if (this.currDataRequest.equals("receiveMove")) {
-            receivedMove(this.gameState.get("col").toString().charAt(0), Integer.parseInt(this.gameState.get("row").toString()));
+            receivedMove(Integer.parseInt(this.gameState.get("col").toString()), this.gameState.get("row").toString().charAt(0));
         }
     }
 
@@ -111,15 +105,15 @@ public class Battleship {
         return this.readyData;
     }
 
-    public String makeMove(char col, int row) {
+    public String makeMove(int col, char row) {
         this.currDataRequest = "sendMove";
         Character.toLowerCase(col);
-        if (col < 'a' || col > 'j') {
-            return "Row out of bounds. Must be between 'a' and 'j', inclusive.";
-        } else if ( row < 0 || row > 9) {
-            return "Column out of bounds. Must be between 0 and 9, inclusive.";
+        if (row < 'a' || row > 'k') {
+            return "Row out of bounds. Must be between 'a' and 'k', inclusive.";
+        } else if ( col < 0 || col > 8) {
+            return "Column out of bounds. Must be between 0 and 8, inclusive.";
         } else {
-            this.sendText(String.format("{  \"option\": \"move\", \"col\": \"%c\", \"row\": %d }", col, row));
+            this.sendText(String.format("{  \"option\": \"move\", \"col\": %d, \"row\": \"%c\" }", col, row));
             
             try {
                 sendMoveLatch.await(); // blocking, only in method scope
@@ -131,7 +125,7 @@ public class Battleship {
         }
     }
 
-    public void receivedMove(char col, int row) {
+    public void receivedMove(int col, char row) {
         this.battleshipInterface.recievedMove(col, row);
     }
 
