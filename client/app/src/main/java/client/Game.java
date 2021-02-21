@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.layout.ColumnConstraints;
@@ -21,26 +22,31 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.control.TextField;
 
 import java.util.concurrent.atomic.AtomicInteger;
-
-import battleship.client.Battleship;
-import battleship.client.BattleshipInterface;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.geometry.Rectangle2D;
-
+import battleship.client.Battleship;
+import battleship.client.BattleshipInterface;
 
 public class Game extends Application implements BattleshipInterface
 {
-    
+    private Battleship battleshipLib;
+    private Stage stage;
+    private Scene scene;
+    private String code;
+    private Board myBoard, enemyBoard;
+    private GridPane pane;
     @Override
-    public void start(Stage stage) throws Exception {
-        Battleship battleshipLib = new Battleship(this);
-        System.out.println(battleshipLib.createNewGame());
+    public void start(Stage primaryStage) throws Exception {
+        this.stage = primaryStage;
+        battleshipLib = new Battleship(this);
+        //System.out.println(battleshipLib.createNewGame());
 
-        Board myBoard = new Board();
-        Board enemyBoard = new Board();
+        myBoard = new Board();
+        enemyBoard = new Board();
         
         Fleet fleet = new Fleet();
         Ship destroyer = new Ship("Destroyer", 0, 2);
@@ -69,7 +75,7 @@ public class Game extends Application implements BattleshipInterface
                 enemyRectangles[i][j].setStroke(Color.BLACK);
             }
         }
-        GridPane pane = new GridPane();
+        pane = new GridPane();
         
         for(int i = 0; i < 880/40; i++){
             pane.getColumnConstraints().add(new ColumnConstraints(40));
@@ -148,7 +154,9 @@ public class Game extends Application implements BattleshipInterface
                         pane.add(rectangle, locationX.get()+1, locationY.get()+1-i);
                     }
                     myBoard.update(fleet.getShips()[counter.get()]);
-                    counter.incrementAndGet();
+                    if(counter.incrementAndGet() == 5){
+                        battleshipLib.setReady(code);
+                    }
                 } else {
                     System.out.println("Invalid placement");
                 }
@@ -167,7 +175,9 @@ public class Game extends Application implements BattleshipInterface
                         rectangle.setFill(Color.GRAY);
                         pane.add(rectangle, locationX.get()+1, locationY.get()+1+i);
                     }
-                    counter.incrementAndGet();
+                    if(counter.incrementAndGet() == 5){
+                        battleshipLib.setReady(code);
+                    }
                 } else {
                     System.out.println("Invalid placement");
                 }
@@ -186,7 +196,9 @@ public class Game extends Application implements BattleshipInterface
                         rectangle.setFill(Color.GRAY);
                         pane.add(rectangle, locationX.get()+1+i, locationY.get()+1);
                     }
-                    counter.incrementAndGet();
+                    if(counter.incrementAndGet() == 5){
+                        battleshipLib.setReady(code);
+                    }
                 } else {
                     System.out.println("Invalid placement");
                 }
@@ -205,74 +217,16 @@ public class Game extends Application implements BattleshipInterface
                         rectangle.setFill(Color.GRAY);
                         pane.add(rectangle, locationX.get()+1-i, locationY.get()+1);
                     }
-                    counter.incrementAndGet();
+                    if(counter.incrementAndGet() == 5){
+                        battleshipLib.setReady(code);
+                    }
                 } else {
                     System.out.println("Invalid placement");
                 }
                 directionPopup.hide();
             }
         });
-        
-        Popup hitPopup = new Popup();
-        hitPopup.setX(visualBounds.getWidth()/2-150);
-        hitPopup.setY(visualBounds.getHeight()/2-150);
-        
-        Rectangle hitPopupRect = new Rectangle(300, 300);
-        hitPopupRect.setFill(Color.WHITE);
-        
-        Button hitButton = new Button("Hit");
-        hitButton.setLayoutX(10);
-        hitButton.setLayoutY(140);
-        
-        Button missButton = new Button("Miss");
-        missButton.setLayoutX(130);
-        missButton.setLayoutY(140);
-        
-        Button sinkButton = new Button("Sink");
-        sinkButton.setLayoutX(250);
-        sinkButton.setLayoutY(140);
-        
-        hitPopup.getContent().addAll(hitPopupRect);
-        hitPopup.getContent().addAll(hitButton);
-        hitPopup.getContent().addAll(missButton);
-        hitPopup.getContent().addAll(sinkButton);
-        hitPopup.hide();
-        
-        hitButton.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                enemyBoard.updatePos(locationY.get(), locationX.get(), 'H');
-                Circle circle = new Circle();
-                circle.setRadius(15);
-                circle.setFill(Color.RED);
-                pane.add(circle, locationX.get()+12, locationY.get()+1);
-                hitPopup.hide();
-                e.consume();
-            }
-        });
-        
-        missButton.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                enemyBoard.updatePos(locationY.get(), locationX.get(), 'M');
-                Circle circle = new Circle();
-                circle.setRadius(15);
-                circle.setFill(Color.GREEN);
-                pane.add(circle, locationX.get()+12, locationY.get()+1);
-                hitPopup.hide();
-                e.consume();
-            }
-        });
-        
-        sinkButton.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                enemyBoard.updatePos(locationY.get(), locationX.get(), 'S');
-                Circle circle = new Circle();
-                circle.setRadius(15);
-                circle.setFill(Color.YELLOW);
-                pane.add(circle, locationX.get()+12, locationY.get()+1);
-                hitPopup.hide();
-                e.consume();
-            }
-        });
+    
         
         pane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             int x = ((int)(event.getSceneX())/40);
@@ -284,53 +238,65 @@ public class Game extends Application implements BattleshipInterface
                     locationX.set(x-1);
                     locationY.set(y-1);
                     directionPopup.show(stage);
-                } else {
-                   Circle circle = new Circle();
-                   circle.setRadius(15);
-                   myBoard.updateUserBoard(y-1, x-1);
-                   if(myBoard.getValue(y-1, x-1) == 'H') {
-                       circle.setFill(Color.RED);
-                   } else {
-                       circle.setFill(Color.GREEN);
-                   }
-                   pane.add(circle, x, y);
                 }
             } else if(x >= 12 && x <= 20 && y >= 1 && y <= 11) {
                 locationX.set(x-12); //Col
                 locationY.set(y-1); //Row
 
-                battleshipLib.makeMove(locationX.get(), (char)(locationY.get() + 97));
-                hitPopup.show(stage);
+                if(battleshipLib.makeMove(locationX.get(), (char)(locationY.get() + 97)).equals("hit")){
+                    enemyBoard.updatePos(locationY.get(), locationX.get(), "H");
+                    addCircle(location.getX()+12, location.getY()+1, Color.RED);
+                } else {
+                    enemyBoard.updatePos(locationY.get(), locationX.get(), "M");
+                    addCircle(location.getX()+12, location.getY()+1, Color.GREEN);
+                }
+                // hitPopup.show(stage);
             }
         });
 
+        scene = new Scene(pane,880,520);
 
-        GridPane startupPane = new GridPane();
-        startupPane.add(new Label("Hello World"), 0, 0);
+        Pane startupPane = new Pane();
+        Label startupLabel = new Label("Welcome to Battleship");
+        startupLabel.setLayoutX(90);
+        startupPane.getChildren().add(startupLabel);
 
-        Button startButton = new Button("Start");
-        startButton.setLayoutX(130);
-        startButton.setLayoutY(5);
+        TextField inputCode = new TextField();
+        inputCode.setLayoutX(70);
+        inputCode.setLayoutY(150);
 
-        boolean startButtonClicked = false;
-        startButton.setOnAction(new EventHandler<ActionEvent>(){
+        Button hostButton = new Button("Host");
+        hostButton.setLayoutX(50);
+        hostButton.setLayoutY(200);
+
+        Button joinButton = new Button("Join");
+        joinButton.setLayoutX(200);
+        joinButton.setLayoutY(200);
+
+        hostButton.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent e) {
-                // startButtonClicked = true;
-                System.out.println("hello world");
+                inputCode.setText(battleshipLib.createNewGame());
+                code = inputCode.getText();
                 e.consume();
             }
         });
-        startupPane.add(startButton, 100, 100);
+        joinButton.setOnAction(new EventHandler<ActionEvent>(){
+            public void handle(ActionEvent e) {
+                battleshipLib.joinGame(inputCode.getText());
+                code = inputCode.getText();
+                e.consume();
+            }
+        });
+        startupPane.getChildren().add(hostButton);
+        startupPane.getChildren().add(joinButton);
+        startupPane.getChildren().add(inputCode);
 
 
-        Scene startupPage = new Scene(startupPane, 880, 520);
+        Scene startupPage = new Scene(startupPane, 300, 300);
         stage.setTitle("Battleship");
         stage.setScene(startupPage);
         stage.show();
 
-        // TODO: show on some conditional after startup is done
-        Scene scene = new Scene(pane,880,520);
-        stage.setScene(scene);
     }
 
     @Override
@@ -340,11 +306,24 @@ public class Game extends Application implements BattleshipInterface
 
     @Override
     public void matchJoined(String arg0) {
-        // TODO Auto-generated method stub
+        stage.setScene(scene);
     }
 
     @Override
     public void recievedMove(int arg0, char arg1) {
-        // TODO Auto-generated method stub
+        myBoard.updateUserBoard((int)(arg1)-97, arg0);
+        if(myBoard.getValue((int)(arg1)-97, arg0) == 'H'){
+            battleshipLib.respondToMove("hit");
+            addCircle((int)(arg1)-97 + 1, arg0 + 1, Color.RED);
+        } else {
+            battleshipLib.respondToMove("miss");
+            addCircle((int)(arg1)-97 + 1, arg0 + 1, Color.GREEN);
+        }
+    }
+    public void addCircle(int x, int y, Color color){
+        Circle circle = new Circle();
+        circle.setRadius(15);
+        circle.setFill(color);
+        pane.add(circle, x, y);
     }
 }
