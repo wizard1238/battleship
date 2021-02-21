@@ -80,6 +80,7 @@ exports.createWSS = function(server) {
                 } else if (!matches[clients[clientId].gameObject.matchId].player1 || !matches[clients[clientId].gameObject.matchId].player2) {
                     ws.send('No other player')
                 } else {
+                    ws.send("ok")
                     var otherClientId = (matches[clients[clientId].gameObject.matchId].player1 == clientId) ? player2 : player1
 
                     clients[otherClientId].ws.send(JSON.stringify({

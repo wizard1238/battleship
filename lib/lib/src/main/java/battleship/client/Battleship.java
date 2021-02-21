@@ -13,12 +13,13 @@ public class Battleship {
     Gson gson = new Gson();
     JsonElement jsonElement;
     JsonObject gameState;
-    String currDataRequest = "", matchId = "", readyData = "", moveData = "", errMsg = "", receivedMove = "";
+    String currDataRequest = "", matchId = "", readyData = "", moveData = "", errMsg = "", receivedMove = "", respond = "";
 
     CountDownLatch createNewGameLatch = new CountDownLatch(1);
     CountDownLatch joinGameLatch = new CountDownLatch(1);
     CountDownLatch readyLatch = new CountDownLatch(1);
     CountDownLatch sendMoveLatch = new CountDownLatch(1);
+    CountDownLatch respondLatch = new CountDownLatch(1);
 
     public Battleship(BattleshipInterface battleshipInterface) throws Exception {
         this.battleshipInterface = battleshipInterface;
@@ -48,6 +49,9 @@ public class Battleship {
             } else if (this.currDataRequest.equals("sendMove")) {
                 sendMoveLatch.countDown();
                 throw new BattleshipParsingException(msg);
+            } else if (this.currDataRequest.equals("respond")) {
+                respond = msg;
+                respondLatch.countDown();
             }
         }
        
@@ -60,10 +64,9 @@ public class Battleship {
         } else if (this.currDataRequest.equals("ready")) {
             this.readyData = this.gameState.get("matchId").toString(); // TODO: Change to actual game object
             readyLatch.countDown();
-        // } else if (this.currDataRequest.equals("sendMove")) {
-        //     this.moveData = this.gameState.get("matchId").toString(); // TODO: Change to actual game object
-        //     sendMoveLatch.countDown();
-        //     System.out.println(this.moveData);
+        } else if (this.currDataRequest.equals("sendMove")) {
+            this.moveData = this.gameState.get("response").toString(); // TODO: Change to actual game object
+            sendMoveLatch.countDown();
         } else if (this.currDataRequest.equals("receiveMove")) {
             receivedMove(Integer.parseInt(this.gameState.get("col").toString()), this.gameState.get("row").toString().charAt(0));
         }
@@ -123,6 +126,21 @@ public class Battleship {
             this.currDataRequest = "receiveMove";
             return this.moveData;
         }
+    }
+
+    public String respondToMove(String status) {
+        if (!status.equals("hit") || !status.equals("miss") || !status.equals("sink")) {
+            return "Status must be hit, miss, or sink";
+        }
+
+        this.currDataRequest = "respond";
+        this.sendText("{ \"option\": \"response\", \"response\": \"" +  status + "\" }");
+
+        try {
+            respondLatch.await(); // blocking, only in method scope
+        } catch (InterruptedException e) {}
+
+        return this.respond;
     }
 
     public void receivedMove(int col, char row) {
