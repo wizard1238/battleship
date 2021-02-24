@@ -244,11 +244,11 @@ public class Game extends Application implements BattleshipInterface
                 locationY.set(y-1); //Row
 
                 if(battleshipLib.makeMove(locationX.get(), (char)(locationY.get() + 97)).equals("hit")){
-                    enemyBoard.updatePos(locationY.get(), locationX.get(), "H");
-                    addCircle(location.getX()+12, location.getY()+1, Color.RED);
+                    enemyBoard.updatePos(locationY.get(), locationX.get(), 'H');
+                    addCircle(locationX.get()+12, locationY.get()+1, Color.RED);
                 } else {
-                    enemyBoard.updatePos(locationY.get(), locationX.get(), "M");
-                    addCircle(location.getX()+12, location.getY()+1, Color.GREEN);
+                    enemyBoard.updatePos(locationY.get(), locationX.get(), 'M');
+                    addCircle(locationX.get()+12, locationY.get()+1, Color.GREEN);
                 }
                 // hitPopup.show(stage);
             }
