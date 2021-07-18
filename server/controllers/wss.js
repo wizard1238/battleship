@@ -19,6 +19,8 @@ exports.createWSS = function(server) {
         clients[clientId].gameObject = {}
 
         ws.on('message', function(msg) {
+            console.log('pog')
+            console.log(msg)
             try {
                 msg = JSON.parse(msg) //For this to work, you have to send {"key": "value"}
             } catch (error) {
@@ -38,6 +40,9 @@ exports.createWSS = function(server) {
                 } else if (!matches[msg.matchId]) {
                     ws.send('No match exists with that matchId')
                 } else {
+                    // var otherClientId = (matches[clients[clientId].gameObject.matchId].player1 == clientId) ? player2 : player1
+                    // console.log(otherClientId)
+                    console.log(matches[msg.matchId])
                     clients[clientId].gameObject.matchId = joinGame(msg.matchId, clientId)
                     ws.send(JSON.stringify(clients[clientId].gameObject))
                 }

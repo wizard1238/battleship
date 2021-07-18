@@ -276,14 +276,12 @@ public class Game extends Application implements BattleshipInterface
         hostButton.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent e) {
                 inputCode.setText(battleshipLib.createNewGame());
-                code = inputCode.getText();
                 e.consume();
             }
         });
         joinButton.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent e) {
                 battleshipLib.joinGame(inputCode.getText());
-                code = inputCode.getText();
                 e.consume();
             }
         });
@@ -306,6 +304,7 @@ public class Game extends Application implements BattleshipInterface
 
     @Override
     public void matchJoined(String arg0) {
+        System.out.println("POG");
         stage.setScene(scene);
     }
 

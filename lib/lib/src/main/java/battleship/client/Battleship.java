@@ -54,6 +54,8 @@ public class Battleship {
                 respondLatch.countDown();
             }
         }
+
+        System.out.println("DEBUGLIB " + msg);
        
         if (this.currDataRequest.equals("join")) {
             this.matchId = this.gameState.get("matchId").toString();
